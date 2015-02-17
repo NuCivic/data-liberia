@@ -1,27 +1,19 @@
 {
     "name": "graylog2/gelf-php",
-    "description": "A php implementation to send log-messages to a GELF compatible backend like Graylog2.",
+    "description": "PHP classes to send GELF (Graylog extended log format) messages",
+    "keywords": ["log","logging"],
+    "homepage": "http://github.com/Graylog2/gelf-php",
+    "type": "library",
     "license": "MIT",
     "authors": [
         {
-            "name": "Benjamin Zikarsky",
-            "email": "benjamin@zikarsky.de"
+            "name": "Lennart Koopmann",
+            "email": "lennart@socketfeed.com",
+            "homepage": "http://www.lennartkoopmann.net/"
         }
     ],
-    "require": {
-        "php": "~5.3",
-        "psr/log": "~1.0"
-    },
     "autoload": {
-        "psr-4": {
-            "Gelf\\": "src/Gelf"
-        }
+        "classmap": [""]
     },
-    "provides": {
-        "psr/log-implementation": "~1.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "~4.3",
-        "squizlabs/php_codesniffer": "~1.5"
-    }
+    "require": {}
 }
