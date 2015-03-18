@@ -55,49 +55,6 @@ class FeedsImporter extends FeedsConfigurable {
   }
 
   /**
-   * Remove items older than $time.
-   *
-   * @param $time
-   *   All items older than REQUEST_TIME - $time will be deleted. If not
-   *   given, internal processor settings will be used.
-   *
-   * @return
-   *   FEEDS_BATCH_COMPLETE if the expiry process finished. A decimal between
-   *   0.0 and 0.9 periodic if expiry is still in progress.
-   *
-   * @throws
-   *   Throws Exception if an error occurs when expiring items.
-   */
-  public function expire($time = NULL) {
-    return $this->processor->expire($time);
-  }
-
-  /**
-   * Schedule all periodic tasks for this importer.
-   */
-  public function schedule() {
-    $this->scheduleExpire();
-  }
-
-  /**
-   * Schedule expiry of items.
-   */
-  public function scheduleExpire() {
-    $job = array(
-      'type' => $this->id,
-      'period' => 0,
-      'periodic' => TRUE,
-    );
-    if (FEEDS_EXPIRE_NEVER != $this->processor->expiryTime()) {
-      $job['period'] = 3600;
-      JobScheduler::get('feeds_importer_expire')->set($job);
-    }
-    else {
-      JobScheduler::get('feeds_importer_expire')->remove($job);
-    }
-  }
-
-  /**
    * Report how many items *should* be created on one page load by this
    * importer.
    *
@@ -155,23 +112,17 @@ class FeedsImporter extends FeedsConfigurable {
   }
 
   /**
-   * Delete configuration. Removes configuration information
-   * from database, does not delete configuration itself.
+   * Deletes configuration.
+   *
+   * Removes configuration information from database, does not delete
+   * configuration itself.
    */
   public function delete() {
     db_delete('feeds_importer')
       ->condition('id', $this->id)
       ->execute();
-    $job = array(
-      'type' => $this->id,
-      'id' => 0,
-    );
-    if ($this->export_type & EXPORT_IN_CODE) {
-      feeds_reschedule($this->id);
-    }
-    else {
-      JobScheduler::get('feeds_importer_expire')->remove($job);
-    }
+
+    feeds_reschedule($this->id);
   }
 
   /**
@@ -242,7 +193,6 @@ class FeedsImporter extends FeedsConfigurable {
         'plugin_key' => 'FeedsNodeProcessor',
       ),
       'content_type' => '',
-      'weight' => 0,
       'update' => 0,
       'import_period' => 1800, // Refresh every 30 minutes by default.
       'expire_period' => 3600, // Expire every hour by default, this is a hidden setting.
@@ -269,12 +219,6 @@ class FeedsImporter extends FeedsConfigurable {
       '#title' => t('Description'),
       '#description' => t('A description of this importer.'),
       '#default_value' => $config['description'],
-    );
-    $form['weight'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Weight'),
-      '#description' => t('Determines the effective processing order of this feed relative to others that might run at the same time.'),
-      '#default_value' => $config['weight'],
     );
     $node_types = node_type_get_names();
     array_walk($node_types, 'check_plain');
@@ -326,6 +270,17 @@ class FeedsImporter extends FeedsConfigurable {
       feeds_reschedule($this->id);
     }
     parent::configFormSubmit($values);
+  }
+
+  /**
+   * Implements FeedsConfigurable::dependencies().
+   */
+  public function dependencies() {
+    $dependencies = parent::dependencies();
+    foreach ($this->plugin_types as $plugin_type) {
+      $dependencies = array_merge($dependencies, $this->$plugin_type->dependencies());
+    }
+    return $dependencies;
   }
 }
 

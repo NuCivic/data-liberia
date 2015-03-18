@@ -5,9 +5,9 @@ package = Fields
 dependencies[] = entityreference
 dependencies[] = entity
 
-
-; Information added by drush on 2014-12-22
-version = "9dbf7cf"
+; Information added by drupal.org packaging script on 2012-05-26
+version = "7.x-2.0-alpha1"
+core = "7.x"
 project = "ref_field"
-datestamp = "1419279665"
+datestamp = "1338050200"
 

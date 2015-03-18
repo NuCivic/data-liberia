@@ -43,3 +43,10 @@ features[variable][] = pathauto_node_dataset_pattern
 features[variable][] = pathauto_node_resource_pattern
 files[] = tests/dkan_dataset.test
 files[] = tests/dkan_dataset_class.test
+
+; Information added by Drupal.org packaging script on 2014-10-17
+version = "7.x-1.5"
+core = "7.x"
+project = "dkan_dataset"
+datestamp = "1413581929"
+

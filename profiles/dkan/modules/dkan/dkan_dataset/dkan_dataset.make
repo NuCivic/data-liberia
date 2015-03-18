@@ -21,7 +21,7 @@ projects[context][subdir] = contrib
 projects[ctools][version] = 1.4
 projects[ctools][subdir] = contrib
 
-projects[date][version] = 2.8
+projects[date][version] = 2.7
 projects[date][subdir] = contrib
 
 projects[double_field][version] = 2.3
@@ -96,30 +96,15 @@ projects[og_extras][download][revision] = "b7e3587"
 projects[og_extras][subdir] = contrib
 projects[og_extras][type] = module
 
-projects[open_data_schema_map][type] = module
-projects[open_data_schema_map][download][type] = git
-projects[open_data_schema_map][download][url] = https://github.com/NuCivic/open_data_schema_map.git
-projects[open_data_schema_map][download][branch] = master
-projects[open_data_schema_map][download][revision] = 1a62a7084c1c81fcf5569acc3c9bba1a0a8ba5f1
-projects[open_data_schema_map][subdir] = contrib
-
-projects[open_data_schema_map_dkan][type] = module
-projects[open_data_schema_map_dkan][download][type] = git
-projects[open_data_schema_map_dkan][download][url] = https://github.com/NuCivic/open_data_schema_map_dkan.git
-projects[open_data_schema_map_dkan][download][branch] = master
-projects[open_data_schema_map_dkan][download][revision] = b652a71d6f7c46b289ec795cd7130c69bcb68f91
-projects[open_data_schema_map_dkan][subdir] = contrib
-
 projects[ref_field][download][type] = git
 projects[ref_field][download][url] = "http://git.drupal.org/project/ref_field.git"
 projects[ref_field][download][patch][1670356] = http://drupal.org/files/removed_notice-1670356-1.patch
-projects[ref_field][download][patch][2360019] = https://www.drupal.org/files/issues/ref_field-delete-insert-warning-2360019-0.patch
+projects[ref_field][download][patch][2201735] = https://drupal.org/files/issues/ref_field-invalid_argument_supplied_for_foreach-2201735-2.patch
 projects[ref_field][download][revision] = 9dbf7cf
 projects[ref_field][subdir] = contrib
 projects[ref_field][type] = module
 
-projects[remote_file_source][version] = 1.x
-projects[remote_file_source][download][patch][2362487] = https://www.drupal.org/files/issues/remote_file_source-location-content-dist.patch
+projects[remote_file_source][version] = 1.0
 projects[remote_file_source][subdir] = contrib
 
 projects[remote_stream_wrapper][version] = 1.0-beta4
@@ -200,9 +185,6 @@ projects[pathauto][version] = 1.2
 projects[pathauto][subdir] = contrib
 
 ; Libraries
-
-includes[recline_make] = https://raw.githubusercontent.com/NuCivic/recline/7.x-1.x/recline.make
-
 libraries[chosen][type] = libraries
 libraries[chosen][download][type] = git
 libraries[chosen][download][url] = "https://github.com/harvesthq/chosen.git"
@@ -224,6 +206,11 @@ libraries[Leaflet][type] = libraries
 libraries[Leaflet][download][type] = git
 libraries[Leaflet][download][url] = "https://github.com/Leaflet/Leaflet.git"
 libraries[Leaflet][download][revision] = "81221ae4cd9772a8974b2e3c867d4fb35abd052d"
+
+libraries[recline][type] = libraries
+libraries[recline][download][type] = git
+libraries[recline][download][url] = "https://github.com/okfn/recline.git"
+libraries[recline][download][revision] = "7757e563ee180e136a8a4008b6ac7b7b56e3050f"
 
 libraries[arc][type] = libraries
 libraries[arc][download][type] = git

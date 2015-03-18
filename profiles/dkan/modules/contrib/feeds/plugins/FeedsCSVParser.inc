@@ -22,14 +22,14 @@ class FeedsCSVParser extends FeedsParser {
     $parser = new ParserCSV();
     $delimiter = $source_config['delimiter'] == 'TAB' ? "\t" : $source_config['delimiter'];
     $parser->setDelimiter($delimiter);
-    $parser->setEncoding($source_config['encoding']);
 
     $iterator = new ParserCSVIterator($fetcher_result->getFilePath());
     if (empty($source_config['no_headers'])) {
       // Get first line and use it for column names, convert them to lower case.
       $header = $this->parseHeader($parser, $iterator);
       if (!$header) {
-        return;
+        drupal_set_message(t('The CSV file is empty.'), 'warning', FALSE);
+        return new FeedsParserResult();
       }
       $parser->setColumnNames($header);
     }
@@ -107,7 +107,6 @@ class FeedsCSVParser extends FeedsParser {
   public function sourceDefaults() {
     return array(
       'delimiter' => $this->config['delimiter'],
-      'encoding' => $this->config['encoding'],
       'no_headers' => $this->config['no_headers'],
     );
   }
@@ -129,10 +128,11 @@ class FeedsCSVParser extends FeedsParser {
         $uniques[] = check_plain($mapping['source']);
       }
     }
+    $sources = array_unique($sources);
 
     $output = t('Import !csv_files with one or more of these columns: !columns.', array('!csv_files' => l(t('CSV files'), 'http://en.wikipedia.org/wiki/Comma-separated_values'), '!columns' => implode(', ', $sources)));
     $items = array();
-    $items[] = format_plural(count($uniques), t('Column <strong>!column</strong> is mandatory and considered unique: only one item per !column value will be created.', array('!column' => implode(', ', $uniques))), t('Columns <strong>!columns</strong> are mandatory and values in these columns are considered unique: only one entry per value in one of these column will be created.', array('!columns' => implode(', ', $uniques))));
+    $items[] = format_plural(count($uniques), 'Column <strong>!columns</strong> is mandatory and considered unique: only one item per !columns value will be created.', 'Columns <strong>!columns</strong> are mandatory and values in these columns are considered unique: only one entry per value in one of these column will be created.', array('!columns' => implode(', ', $uniques)));
     $items[] = l(t('Download a template'), 'import/' . $this->id . '/template');
     $form['help'] = array(
       '#prefix' => '<div class="help">',
@@ -166,7 +166,6 @@ class FeedsCSVParser extends FeedsParser {
       '#description' => t('Check if the imported CSV file does not start with a header row. If checked, mapping sources must be named \'0\', \'1\', \'2\' etc.'),
       '#default_value' => isset($source_config['no_headers']) ? $source_config['no_headers'] : 0,
     );
-    $form['encoding'] = $this->configEncodingForm();
     return $form;
   }
 
@@ -176,7 +175,6 @@ class FeedsCSVParser extends FeedsParser {
   public function configDefaults() {
     return array(
       'delimiter' => ',',
-      'encoding' => 'UTF-8',
       'no_headers' => 0,
     );
   }
@@ -205,31 +203,6 @@ class FeedsCSVParser extends FeedsParser {
       '#description' => t('Check if the imported CSV file does not start with a header row. If checked, mapping sources must be named \'0\', \'1\', \'2\' etc.'),
       '#default_value' => $this->config['no_headers'],
     );
-    $form['encoding'] = $this->configEncodingForm();
-    return $form;
-  }
-
-  public function configEncodingForm() {
-    if (extension_loaded('mbstring')) {
-      // Get the system's list of available encodings.
-      $options = mb_list_encodings();
-      // Make the key/values the same in the array.
-      $options = array_combine($options, $options);
-      // Sort alphabetically not-case sensitive.
-      natcasesort($options);
-      return array(
-        '#type' => 'select',
-        '#title' => t('File encoding'),
-        '#description' => t('Performs character encoding conversion from selected option to UTF-8.'),
-        '#options' => $options,
-        '#default_value' => $this->config['encoding'],
-      );
-    }
-    else {
-      return array(
-        '#markup' => '<em>' . t('PHP <em>mbstring</em> extension must be available for character encoding conversion.') . '</em>',
-      );
-    }
     return $form;
   }
 
@@ -237,6 +210,11 @@ class FeedsCSVParser extends FeedsParser {
     $mappings = feeds_importer($this->id)->processor->config['mappings'];
     $sources = $uniques = array();
     foreach ($mappings as $mapping) {
+      if (in_array(check_plain($mapping['source']), $uniques) || in_array(check_plain($mapping['source']), $sources)) {
+        // Skip columns we've already seen.
+        continue;
+      }
+
       if (!empty($mapping['unique'])) {
         $uniques[] = check_plain($mapping['source']);
       }
